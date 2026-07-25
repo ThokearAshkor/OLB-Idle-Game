@@ -174,6 +174,7 @@
   .reward-chip.chip-exp   { background: #F2EDE3; border-color: var(--leather); color: var(--leather); }
   .reward-chip.chip-stat  { background: var(--wax-light); border-color: var(--wax); color: var(--wax); }
   .reward-chip.chip-skill { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+  .reward-chip.chip-cost  { background: #F9EDE8; border-color: #C0604A; color: #C0604A; }
 
   /* ── Skills panel ──────────────────────────────────── */
   .panel-title { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
@@ -651,6 +652,69 @@ const EVENTS = [
   { weight: 2, affinity: 'social',
     text: () => `A village celebrates something as you pass through. You are pulled in, fed, and set back on the road an hour later with no explanation given.`,
     rewards: () => ({ exp: 40, hp: 30, sp: 20 }) },
+
+  // ── RISK EVENTS ───────────────────────────────────
+  // HP costs
+  { weight: 5, affinity: 'endurance',
+    text: () => `You slip on a wet stone crossing a stream and go down hard. Nothing broken. Everything bruised.`,
+    rewards: () => ({ exp: 15, hp: -20, sp: -10 }) },
+  { weight: 4, affinity: 'endurance',
+    text: () => `A low branch you did not see. You continue, blinking, with a long scratch across your cheek and a dent in your dignity.`,
+    rewards: () => ({ exp: 8, hp: -12 }) },
+  { weight: 3, affinity: 'endurance',
+    text: () => `The sun is merciless today. By midday you are red, dazed, and moving slower than you would like to admit.`,
+    rewards: () => ({ exp: 20, hp: -25, sp: -20 }) },
+  { weight: 3, affinity: 'nature',
+    text: () => `Something bites you in the long grass — you never see what. Your ankle swells slightly. You walk it off, slowly.`,
+    rewards: () => ({ exp: 12, hp: -18 }) },
+  { weight: 2, affinity: 'nature',
+    text: () => `You eat something from a bush that looked edible. It was not. You spend an uncomfortable hour by the road and resolve to be less optimistic.`,
+    rewards: () => ({ exp: 10, hp: -30 }) },
+  { weight: 2, affinity: 'endurance',
+    text: () => `A section of road gives way beneath you — an old culvert, rotten through. You haul yourself out of a cold ditch, winded and wet.`,
+    rewards: () => ({ exp: 25, hp: -35, sp: -15 }) },
+
+  // SP costs
+  { weight: 6, affinity: 'endurance',
+    text: () => `The road climbs without warning and does not stop. You arrive at the top breathing hard, legs burning, grateful only that it is over.`,
+    rewards: () => ({ exp: 18, sp: -25 }) },
+  { weight: 5, affinity: 'endurance',
+    text: () => `Headwinds for two miles. Every step costs twice what it should. You arrive somewhere with nothing left in reserve.`,
+    rewards: () => ({ exp: 14, sp: -30 }) },
+  { weight: 4, affinity: 'social',
+    text: () => `A traveller in distress. You spend an hour helping them sort themselves out. They are grateful. You are tired.`,
+    rewards: () => ({ exp: 22, sp: -20 }) },
+  { weight: 3, affinity: 'endurance',
+    text: () => `You take a wrong turn and walk an extra mile before realising it. The road back is the same distance. You do not complain, but you think about it.`,
+    rewards: () => ({ exp: 8, sp: -35 }) },
+
+  // MP costs
+  { weight: 5, affinity: 'arcane',
+    text: () => `A stretch of road where the light bends wrong and the sounds come from the wrong directions. You get through it, but something in you is quieter than before.`,
+    rewards: () => ({ exp: 20, mp: -20 }) },
+  { weight: 4, affinity: 'arcane',
+    text: () => `A figure stands at the road's edge and watches you pass. It has no face. When you look back it is gone. You feel hollowed out.`,
+    rewards: () => ({ exp: 15, mp: -25 }) },
+  { weight: 3, affinity: 'arcane',
+    text: () => `You hear your name spoken clearly, once, from somewhere above. There is nothing above. You walk faster for a while.`,
+    rewards: () => ({ exp: 18, mp: -15 }) },
+  { weight: 2, affinity: 'arcane',
+    text: () => `The road passes through a section where your shadow is missing. When it returns a mile later it is slightly the wrong shape.`,
+    rewards: () => ({ exp: 30, mp: -35 }) },
+
+  // Mixed: cost one, gain another
+  { weight: 4, affinity: 'endurance',
+    text: () => `A hard road, but a fast one. You push through the pain and arrive somewhere ahead of where you expected to be.`,
+    rewards: () => ({ exp: 35, hp: -20, sp: -15 }) },
+  { weight: 3, affinity: 'arcane',
+    text: () => `Something passes through you on the road — a cold presence, curious, brief. It leaves your mind clearer and your body cold.`,
+    rewards: () => ({ exp: 25, hp: -15, mp: 20 }) },
+  { weight: 3, affinity: 'nature',
+    text: () => `You drink from a stream that tastes of iron and something sweeter. Your legs ache afterward but your head is unusually clear.`,
+    rewards: () => ({ exp: 20, hp: -10, mp: 15 }) },
+  { weight: 2, affinity: 'luck',
+    text: () => `You fall into a ravine and land on something soft. The something soft turns out to be valuable. It was still a bad fall.`,
+    rewards: () => ({ exp: 30, hp: -25 }) },
 ];
 
 // ── Default state ─────────────────────────────────────
@@ -666,7 +730,7 @@ function defaultState(name) {
     skillsUnlocked: [],   // array of effect strings
     affinities: { endurance: 0, luck: 0, arcane: 0, nature: 0, social: 0 },
     locationIndex: 0, locationSteps: 0,
-    log: [], isResting: false, lastSaved: Date.now(),
+    log: [], isResting: false, forcedRest: false, lastSaved: Date.now(),
   };
 }
 
@@ -714,6 +778,7 @@ function logWake(html)          { pushLog('Resumed',      '',         '',       
 function logTitle(html, chips)  { pushLog('Title earned', 'tag-rare', 'dot-rare', 'ev-rare',  html, chips); }
 function logSkill(html, chips)  { pushLog('Skill learned','tag-skill','dot-skill','ev-skill', html, chips); }
 function logLocation(html)      { pushLog('New ground',   'tag-event','dot-event','ev-event', html); }
+function logForced(html)        { pushLog('Forced rest',  'tag-rare', 'dot-rest', 'ev-rest',   html); }
 
 // ── Skill checking ────────────────────────────────────
 function checkSkills() {
@@ -818,10 +883,20 @@ function applyRewards(rewards, affinity) {
   // Windfall: 15% chance to double event EXP
   if (hasSkill('exp_windfall') && Math.random() < 0.15) expAmt *= 2;
 
-  if (expAmt)      gainExp(expAmt);
-  if (rewards.hp)  state.hp = Math.min(maxHP(state.level) + (hasSkill('hp_max_bonus') ? 40 : 0), state.hp + rewards.hp);
-  if (rewards.mp)  state.mp = Math.min(maxMP(state.level) + (hasSkill('mp_max_bonus') ? 40 : 0), state.mp + rewards.mp);
-  if (rewards.sp)  state.sp = Math.min(maxSP(state.level) + (hasSkill('sp_max_bonus') ? 50 : 0), state.sp + Math.max(0, rewards.sp));
+  if (expAmt) gainExp(expAmt);
+
+  const hpMax = maxHP(state.level) + (hasSkill('hp_max_bonus') ? 40 : 0);
+  const mpMax = maxMP(state.level) + (hasSkill('mp_max_bonus') ? 40 : 0);
+  const spMax = maxSP(state.level) + (hasSkill('sp_max_bonus') ? 50 : 0);
+
+  if (rewards.hp) {
+    // Endurance skill: reduce incoming HP damage by 25%
+    const hpDelta = rewards.hp < 0 && hasSkill('sp_max_bonus')
+      ? Math.ceil(rewards.hp * 0.75) : rewards.hp;
+    state.hp = Math.max(0, Math.min(hpMax, state.hp + hpDelta));
+  }
+  if (rewards.mp) state.mp = Math.max(0, Math.min(mpMax, state.mp + rewards.mp));
+  if (rewards.sp) state.sp = Math.max(0, Math.min(spMax, state.sp + rewards.sp));
 }
 
 // ── Location ──────────────────────────────────────────
@@ -865,15 +940,24 @@ function tick() {
   const resting = shouldRest();
 
   if (resting && !state.isResting) {
-    state.isResting = true; state.days++;
-    // Storied Road daily bonus
+    state.isResting = true; state.forcedRest = false; state.days++;
     if (hasSkill('day_bonus')) gainExp(state.days * 5);
-    logRest('Darkness falls. You find a sheltered spot and lay your pack down. Tomorrow the road continues.');
+    // Full HP/MP/SP restore on a proper night's rest
+    state.hp = maxHP(state.level) + (hasSkill('hp_max_bonus') ? 40 : 0);
+    state.mp = maxMP(state.level) + (hasSkill('mp_max_bonus') ? 40 : 0);
+    state.sp = maxSP(state.level) + (hasSkill('sp_max_bonus') ? 50 : 0);
+    logRest('Darkness falls. You find a sheltered spot, eat what you have, and sleep deeply. Tomorrow the road continues.');
     save(); updateUI(); return;
   }
   if (!resting && state.isResting) {
     state.isResting = false;
-    logWake('Morning light returns. You rise, shake the dew from your cloak, and set your feet to the road once more.');
+    const wasForcedRest = state.forcedRest;
+    state.forcedRest = false;
+    if (wasForcedRest) {
+      logWake('You wake stiff and sore, the rough ground having done you no favours. Still — the road is there. You rise.');
+    } else {
+      logWake('Morning light returns. You rise, shake the dew from your cloak, and set your feet to the road once more.');
+    }
     save(); updateUI(); return;
   }
   if (state.isResting) { updateUI(); return; }
@@ -929,10 +1013,33 @@ function tick() {
 
     const chips = [];
     if (rewards.exp) chips.push({ label: `+ ${rewards.exp} exp`, cls: 'chip-exp' });
-    if (rewards.hp && rewards.hp > 0)  chips.push({ label: `+ ${rewards.hp} HP`,  cls: 'chip-stat' });
-    if (rewards.sp && rewards.sp > 0)  chips.push({ label: `+ ${rewards.sp} SP`,  cls: 'chip-stat' });
+    if (rewards.hp)  chips.push({ label: `${rewards.hp > 0 ? '+' : ''}${rewards.hp} HP`, cls: rewards.hp > 0 ? 'chip-stat' : 'chip-cost' });
+    if (rewards.mp)  chips.push({ label: `${rewards.mp > 0 ? '+' : ''}${rewards.mp} MP`, cls: rewards.mp > 0 ? 'chip-stat' : 'chip-cost' });
+    if (rewards.sp)  chips.push({ label: `${rewards.sp > 0 ? '+' : ''}${rewards.sp} SP`, cls: rewards.sp > 0 ? 'chip-stat' : 'chip-cost' });
     logEvent(ev.text(state), chips);
     state.eventsFound++;
+
+    // 0 HP → forced early rest
+    if (state.hp <= 0) {
+      state.hp = 0;
+      state.isResting = true;
+      state.forcedRest = true;
+      state.days++;
+      // Partial restore: 50% HP, full MP/SP
+      const hpMax = maxHP(state.level) + (hasSkill('hp_max_bonus') ? 40 : 0);
+      state.hp = Math.floor(hpMax * 0.5);
+      state.mp = maxMP(state.level) + (hasSkill('mp_max_bonus') ? 40 : 0);
+      state.sp = maxSP(state.level) + (hasSkill('sp_max_bonus') ? 50 : 0);
+      const forcedRestLines = [
+        `The world tilts. You find the nearest ditch and fold yourself into it, too spent to go further. You will continue when you can.`,
+        `Your legs give out on a patch of grass beside the road. You do not choose to stop — the road chooses for you. You sleep where you fall.`,
+        `Something has taken too much from you today. You crawl under a hedgerow and close your eyes. The road will still be there in the morning.`,
+        `You stagger to a milestone and sit against it, then do not get up. The stars wheel overhead while you recover what you can.`,
+        `The road wins this round. You find a hollow tree and squeeze yourself inside it, sleeping badly but sleeping nonetheless.`,
+      ];
+      logForced(forcedRestLines[Math.floor(Math.random() * forcedRestLines.length)]);
+      save(); updateUI(); return;
+    }
 
     // Beast-Familiar: animal events restore HP/SP
     if (ev.affinity === 'nature' && hasSkill('beast_heal')) {
@@ -1005,7 +1112,9 @@ function updateUI() {
   const dot   = document.getElementById('ui-status-dot');
   const label = document.getElementById('ui-status-label');
   if (state.isResting) {
-    dot.className = 'status-dot resting'; label.textContent = 'Resting'; label.style.color = '#5B7FA6';
+    dot.className = 'status-dot resting';
+    label.textContent = state.forcedRest ? 'Down for the count' : 'Resting';
+    label.style.color = state.forcedRest ? '#C0604A' : '#5B7FA6';
     document.getElementById('ui-step-rate').textContent = '— steps / sec';
     document.getElementById('ui-rest-time').textContent = `Resumes at ${WAKE_HOUR}:00 am`;
   } else {
