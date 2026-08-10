@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Long Road — Widget</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --parchment:      #EFE6D3;
+    --parchment-mid:  #E2D5BC;
+    --parchment-deep: #D0BF9E;
+    --ink:            #3A3226;
+    --ink-faded:      #6B5E4E;
+    --ink-ghost:      #9A8C7C;
+    --leather:        #8B6F47;
+    --leather-light:  #C4A97D;
+    --moss:           #6B7F5E;
+    --moss-light:     #E8EDE5;
+    --wax:            #A8431F;
+    --wax-light:      #F4E8E3;
+    --blue:           #5B7FA6;
+    --blue-light:     #E8EEF4;
+
+    --font-display: 'Spectral', Georgia, serif;
+    --font-body:    'Source Serif 4', Georgia, serif;
+    --font-data:    'JetBrains Mono', monospace;
+  }
+
+  html, body {
+    background: transparent;
+}
+
+.widget {
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.5;
+}
+
+  /* ── Widget card ───────────────────────────────────── */
+  .widget {
+    background: var(--parchment);
+    border: 2px solid var(--leather);
+    border-radius: 6px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 240px;
+    font-family: var(--font-body);
+  }
+
+  /* Header */
+  .widget-header {
+    background: var(--ink);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--leather);
+  }
+
+  .widget-wordmark {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--parchment);
+    letter-spacing: 0.03em;
+  }
+
+  .widget-wordmark span { color: var(--leather-light); }
+
+  .widget-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .widget-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--moss);
+    flex-shrink: 0;
+  }
+
+  .widget-dot.walking { animation: pulse 2s ease-in-out infinite; }
+  .widget-dot.resting { background: var(--blue); animation: none; }
+  .widget-dot.forced  { background: #C0604A; animation: none; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
+  }
+
+  .widget-status-txt {
+    font-family: var(--font-data);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+  }
+
+  /* Character block */
+  .widget-char {
+    padding: 12px 12px 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border-bottom: 1px solid var(--parchment-deep);
+    background: var(--parchment-mid);
+  }
+
+  .widget-portrait {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--leather);
+    background: var(--parchment-deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .widget-portrait-emoji { font-size: 20px; line-height: 1; }
+  .widget-portrait-img   { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+
+  .widget-char-info { flex: 1; min-width: 0; }
+
+  .widget-char-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .widget-char-level {
+    font-family: var(--font-data);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    margin-top: 1px;
+  }
+
+  .widget-char-title {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-style: italic;
+    color: var(--wax);
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Stat bars */
+  .widget-stats {
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-bottom: 1px solid var(--parchment-deep);
+  }
+
+  .widget-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .widget-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .widget-stat-name {
+    font-family: var(--font-data);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+  }
+
+  .widget-stat-val {
+    font-family: var(--font-data);
+    font-size: 9px;
+    color: var(--ink-faded);
+  }
+
+  .widget-bar-track {
+    height: 4px;
+    background: var(--parchment-deep);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .widget-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s ease;
+  }
+
+  .bar-hp  { background: var(--wax); }
+  .bar-mp  { background: var(--blue); }
+  .bar-sp  { background: var(--moss); }
+  .bar-exp { background: var(--leather-light); }
+
+  /* Journey stats row */
+  .widget-journey {
+    padding: 8px 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    border-bottom: 1px solid var(--parchment-deep);
+  }
+
+  .widget-journey-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .widget-journey-label {
+    font-family: var(--font-data);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+  }
+
+  .widget-journey-val {
+    font-family: var(--font-data);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* Location */
+  .widget-location {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--parchment-deep);
+  }
+
+  .widget-loc-eyebrow {
+    font-family: var(--font-data);
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--moss);
+    margin-bottom: 2px;
+  }
+
+  .widget-loc-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* Path progress */
+  .widget-path {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--parchment-deep);
+  }
+
+  .widget-path-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+
+  .widget-path-label {
+    font-family: var(--font-data);
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-ghost);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 48%;
+  }
+
+  .widget-path-track {
+    height: 3px;
+    background: var(--parchment-deep);
+    border-radius: 2px;
+    overflow: visible;
+    position: relative;
+  }
+
+  .widget-path-fill {
+    height: 100%;
+    background: var(--leather);
+    border-radius: 2px;
+    position: relative;
+    transition: width 0.8s ease;
+    min-width: 12px;
+  }
+
+  .widget-walker {
+    position: absolute;
+    right: -7px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    line-height: 1;
+  }
+
+  /* Footer / open link */
+  .widget-footer {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--parchment-mid);
+  }
+
+  .widget-step-count {
+    font-family: var(--font-data);
+    font-size: 9px;
+    color: var(--ink-ghost);
+    letter-spacing: 0.04em;
+  }
+
+  .widget-open-link {
+    font-family: var(--font-data);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--leather);
+    text-decoration: none;
+    border: 1px solid var(--leather);
+    padding: 3px 8px;
+    border-radius: 10px;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .widget-open-link:hover {
+    background: var(--leather);
+    color: var(--parchment);
+  }
+
+  /* No-save state */
+  .widget-nosave {
+    padding: 16px 12px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-ghost);
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  .widget-nosave a {
+    display: inline-block;
+    margin-top: 10px;
+    font-family: var(--font-data);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--leather);
+    text-decoration: none;
+    border: 1px solid var(--leather);
+    padding: 4px 10px;
+    border-radius: 10px;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .widget-nosave a:hover {
+    background: var(--leather);
+    color: var(--parchment);
+  }
+
+  /* Rest overlay */
+  .widget-rest-banner {
+    padding: 6px 12px;
+    background: var(--blue-light);
+    border-top: 1px solid var(--blue);
+    border-bottom: 1px solid var(--blue);
+    font-family: var(--font-data);
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    color: var(--blue);
+    text-align: center;
+    display: none;
+  }
+
+  .widget-rest-banner.forced {
+    background: var(--wax-light);
+    border-color: #C0604A;
+    color: #C0604A;
+  }
+</style>
+</head>
+<body>
+
+<div class="widget" id="widget">
+
+  <div class="widget-header">
+    <div class="widget-wordmark">The <span>Long Road</span></div>
+    <div class="widget-status">
+      <div class="widget-dot walking" id="w-dot"></div>
+      <span class="widget-status-txt" id="w-status">Walking</span>
+    </div>
+  </div>
+
+  <!-- Shown when no save exists -->
+  <div class="widget-nosave hidden" id="w-nosave">
+    The road is waiting.<br>Your journey has not begun.
+    <br><a href="https://onelastforum.com/pages/the-long-road/" target="_blank">Begin the journey</a>
+  </div>
+
+  <!-- Shown when save exists -->
+  <div id="w-game">
+
+    <div class="widget-rest-banner" id="w-rest-banner">Resting until morning</div>
+
+    <div class="widget-char">
+      <div class="widget-portrait" id="w-portrait">
+        <span class="widget-portrait-emoji" id="w-emoji">🧙</span>
+        <img class="widget-portrait-img hidden" id="w-img" alt="">
+      </div>
+      <div class="widget-char-info">
+        <div class="widget-char-name"  id="w-name">—</div>
+        <div class="widget-char-level" id="w-level">The Traveler · Lv. 1</div>
+        <div class="widget-char-title" id="w-title">"First Step"</div>
+      </div>
+    </div>
+
+    <div class="widget-stats">
+      <div class="widget-stat">
+        <div class="widget-stat-row">
+          <span class="widget-stat-name">HP</span>
+          <span class="widget-stat-val" id="w-hp-val">100 / 100</span>
+        </div>
+        <div class="widget-bar-track"><div class="widget-bar-fill bar-hp" id="w-hp-bar" style="width:100%"></div></div>
+      </div>
+      <div class="widget-stat">
+        <div class="widget-stat-row">
+          <span class="widget-stat-name">MP</span>
+          <span class="widget-stat-val" id="w-mp-val">50 / 50</span>
+        </div>
+        <div class="widget-bar-track"><div class="widget-bar-fill bar-mp" id="w-mp-bar" style="width:100%"></div></div>
+      </div>
+      <div class="widget-stat">
+        <div class="widget-stat-row">
+          <span class="widget-stat-name">SP</span>
+          <span class="widget-stat-val" id="w-sp-val">100 / 100</span>
+        </div>
+        <div class="widget-bar-track"><div class="widget-bar-fill bar-sp" id="w-sp-bar" style="width:100%"></div></div>
+      </div>
+      <div class="widget-stat">
+        <div class="widget-stat-row">
+          <span class="widget-stat-name">EXP</span>
+          <span class="widget-stat-val" id="w-exp-val">0 / 100</span>
+        </div>
+        <div class="widget-bar-track"><div class="widget-bar-fill bar-exp" id="w-exp-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="widget-journey">
+      <div class="widget-journey-tile">
+        <span class="widget-journey-label">Steps</span>
+        <span class="widget-journey-val" id="w-steps">0</span>
+      </div>
+      <div class="widget-journey-tile">
+        <span class="widget-journey-label">Level</span>
+        <span class="widget-journey-val" id="w-lv">1</span>
+      </div>
+      <div class="widget-journey-tile">
+        <span class="widget-journey-label">Day</span>
+        <span class="widget-journey-val" id="w-day">1</span>
+      </div>
+      <div class="widget-journey-tile">
+        <span class="widget-journey-label">Items</span>
+        <span class="widget-journey-val" id="w-items">0</span>
+      </div>
+    </div>
+
+    <div class="widget-location">
+      <div class="widget-loc-eyebrow">Now in</div>
+      <div class="widget-loc-name" id="w-loc">The First Road</div>
+    </div>
+
+    <div class="widget-path">
+      <div class="widget-path-labels">
+        <span class="widget-path-label" id="w-path-from">The First Road</span>
+        <span class="widget-path-label" style="text-align:right" id="w-path-to">Millbrook Crossing</span>
+      </div>
+      <div class="widget-path-track">
+        <div class="widget-path-fill" id="w-path-fill" style="width:0%">
+          <span class="widget-walker">🚶</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="widget-footer">
+      <span class="widget-step-count" id="w-step-rate">1 step / sec</span>
+      <a href="https://onelastforum.com/pages/the-long-road/" target="_blank" class="widget-open-link">Open journal</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  THE LONG ROAD — Widget Engine
+//  Shares localStorage save key with the main game.
+//  Runs its own tick so progress continues on forum pages.
+// ════════════════════════════════════════════════════════
+
+const SAVE_KEY  = 'tlr_save_v2';
+const REST_HOUR = 22;
+const WAKE_HOUR = 9;
+const LOG_MAX   = 100;
+
+// ── Scaling (must match main game exactly) ────────────
+function expToNext(l) { return Math.round(100 * Math.pow(1.5, l - 1)); }
+function maxHP(l) { return 100 + (l - 1) * 20; }
+function maxMP(l) { return  50 + (l - 1) * 10; }
+function maxSP(l) { return 100 + (l - 1) * 15; }
+
+// ── Locations (must match main game) ─────────────────
+const LOCATIONS = [
+  { name: 'The First Road',     stepsNeeded: 500   },
+  { name: 'Millbrook Crossing', stepsNeeded: 1200  },
+  { name: 'The Hollow Road',    stepsNeeded: 2500  },
+  { name: 'Greymere Crossing',  stepsNeeded: 4500  },
+  { name: 'The Ashfield',       stepsNeeded: 7500  },
+  { name: 'Duskwatch Tower',    stepsNeeded: 12000 },
+  { name: 'The Sunken Road',    stepsNeeded: 18000 },
+  { name: 'The Pale Moors',     stepsNeeded: 27000 },
+  { name: 'Thornwall Village',  stepsNeeded: 40000 },
+  { name: 'The Wandering Wood', stepsNeeded: 60000 },
+];
+
+// ── Minimal skill / affinity data needed for widget ──
+// (widget runs the same passive effects as the main game)
+const AFFINITY_THRESHOLDS = [3, 8, 16, 28];
+
+const SKILL_EFFECTS = {
+  endurance: ['sure_footed','bonus_steps','sp_max_bonus','double_step_exp'],
+  luck:      ['item_rate_up','rare_rate_up','exp_windfall','mile_bonus'],
+  arcane:    ['arcane_freq','arcane_exp','mp_max_bonus','deep_road_exp'],
+  nature:    ['hp_regen','beast_heal','hp_max_bonus','loc_exp'],
+  social:    ['social_exp','social_freq','social_items','day_bonus'],
+};
+
+// ── Helpers ───────────────────────────────────────────
+function fmt(n)    { return Math.floor(n).toLocaleString(); }
+function pct(a, b) { return Math.min(100, Math.max(0, (a / b) * 100)).toFixed(1) + '%'; }
+function shouldRest() { const h = new Date().getHours(); return h >= REST_HOUR || h < WAKE_HOUR; }
+function timeLabel() {
+  const now = new Date(); let h = now.getHours(), m = now.getMinutes();
+  const ap = h >= 12 ? 'pm' : 'am'; h = h % 12 || 12;
+  return `${h}:${String(m).padStart(2,'0')} ${ap}`;
+}
+function weightedPick(arr) {
+  const total = arr.reduce((s,x) => s + (x.weight||1), 0);
+  let r = Math.random() * total;
+  for (const x of arr) { r -= (x.weight||1); if (r <= 0) return x; }
+  return arr[arr.length-1];
+}
+
+// ── Persistence ───────────────────────────────────────
+function load() {
+  try { const r = localStorage.getItem(SAVE_KEY); if (r) return JSON.parse(r); } catch(e) {}
+  return null;
+}
+function save(s) {
+  s.lastSaved = Date.now();
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); } catch(e) {}
+}
+
+// ── Skill helpers ─────────────────────────────────────
+function buildSkillSet(state) {
+  const set = new Set(state.skillsUnlocked || []);
+  return { has: e => set.has(e) };
+}
+
+// ── EXP & levelling ───────────────────────────────────
+function gainExp(state, skills, amount) {
+  if (skills.has('double_step_exp') && amount === 1) amount = 2;
+  state.exp += amount;
+  while (state.exp >= expToNext(state.level)) {
+    state.exp -= expToNext(state.level);
+    state.level++;
+    state.hp = maxHP(state.level);
+    state.mp = maxMP(state.level);
+    state.sp = maxSP(state.level);
+  }
+}
+
+// ── Check & unlock skills ─────────────────────────────
+function checkSkills(state) {
+  const unlocked = new Set(state.skillsUnlocked || []);
+  for (const [aff, effects] of Object.entries(SKILL_EFFECTS)) {
+    const count = (state.affinities || {})[aff] || 0;
+    effects.forEach((effect, i) => {
+      if (count >= AFFINITY_THRESHOLDS[i] && !unlocked.has(effect)) {
+        unlocked.add(effect);
+        state.skillsUnlocked = [...unlocked];
+        // Apply permanent stat bonuses
+        if (effect === 'sp_max_bonus') state.sp = Math.min(maxSP(state.level)+50, state.sp+50);
+        if (effect === 'mp_max_bonus') state.mp = Math.min(maxMP(state.level)+40, state.mp+40);
+        if (effect === 'hp_max_bonus') state.hp = Math.min(maxHP(state.level)+40, state.hp+40);
+      }
+    });
+  }
+}
+
+// ── Check titles ──────────────────────────────────────
+// Widget doesn't log title events but does update the earned list
+// so the main game reflects them correctly on next open.
+function checkTitles(state) {
+  // Minimal title conditions mirrored from main game
+  const TITLE_CONDITIONS = [
+    { id: 'first_step',   label: 'First Step',           check: s => s.steps >= 1 },
+    { id: 'hundred',      label: 'The Persistent',        check: s => s.steps >= 100 },
+    { id: 'wanderer',     label: 'The Wanderer',          check: s => s.steps >= 500 },
+    { id: 'thousand',     label: 'A Thousand Miles',      check: s => s.steps >= 1000 },
+    { id: 'tenthousand',  label: 'The Long-Haul',         check: s => s.steps >= 10000 },
+    { id: 'collector',    label: 'Finder of Odd Stones',  check: s => s.itemsFound >= 10 },
+    { id: 'hoarder',      label: 'The Collector',         check: s => s.itemsFound >= 25 },
+    { id: 'seasoned',     label: 'Seasoned Traveler',     check: s => s.days >= 7 },
+    { id: 'level5',       label: 'Road-Worn',             check: s => s.level >= 5 },
+    { id: 'level10',      label: 'Far-Travelled',         check: s => s.level >= 10 },
+    { id: 'level20',      label: 'The Weathered',         check: s => s.level >= 20 },
+    { id: 'skilled',      label: 'Marked by the Road',    check: s => (s.skillsUnlocked||[]).length >= 1 },
+    { id: 'adept',        label: 'Road-Adept',            check: s => (s.skillsUnlocked||[]).length >= 5 },
+    { id: 'master',       label: 'The Road-Touched',      check: s => (s.skillsUnlocked||[]).length >= 10 },
+    { id: 'fifty_thou',   label: 'Fifty Thousand Steps',  check: s => s.steps >= 50000 },
+    { id: 'hundred_thou', label: 'The Endless',           check: s => s.steps >= 100000 },
+    { id: 'level30',      label: 'Deeply Travelled',      check: s => s.level >= 30 },
+    { id: 'level50',      label: 'The Inexhaustible',     check: s => s.level >= 50 },
+    { id: 'month',        label: 'A Month on the Road',   check: s => s.days >= 30 },
+    { id: 'many_things',  label: 'Keeper of Strange Things', check: s => s.itemsFound >= 50 },
+    { id: 'down_once',    label: 'What Does Not Kill',    check: s => (s.forcedRests||0) >= 1 },
+    { id: 'down_five',    label: 'Hard-Won Miles',        check: s => (s.forcedRests||0) >= 5 },
+    { id: 'reach_ashfield',label:'Beyond the Crossing',   check: s => s.locationIndex >= 4 },
+    { id: 'reach_moors',  label: 'Walker of Pale Places', check: s => s.locationIndex >= 7 },
+    { id: 'reach_wood',   label: 'Into the Wandering Wood', check: s => s.locationIndex >= 9 },
+  ];
+  const earned = new Set(state.titlesEarned || ['first_step']);
+  for (const t of TITLE_CONDITIONS) {
+    if (!earned.has(t.id) && t.check(state)) {
+      earned.add(t.id);
+      state.titlesEarned = [...earned];
+      // Auto-update active title to latest earned
+      state.activeTitle = t.label;
+    }
+  }
+}
+
+// ── Location progression ──────────────────────────────
+function checkLocation(state, skills) {
+  const cur = LOCATIONS[state.locationIndex];
+  if (!cur) return;
+  if (state.locationSteps >= cur.stepsNeeded && state.locationIndex < LOCATIONS.length - 1) {
+    state.locationIndex++;
+    state.locationSteps = 0;
+    let expBonus = 0;
+    if (skills.has('loc_exp'))       expBonus += 50;
+    if (skills.has('deep_road_exp') && state.locationIndex >= 4) expBonus += 100;
+    if (expBonus) gainExp(state, skills, expBonus);
+  }
+}
+
+// ── Minimal event pool for widget ────────────────────
+// Widget fires a simplified event set — enough to drive
+// affinity counters and keep stats moving.
+// Full flavor text lives in the main game log.
+const W_EVENTS = [
+  { weight:8, affinity:'endurance', rewards:()=>({ exp:4,  sp:10 }) },
+  { weight:7, affinity:'endurance', rewards:()=>({ exp:8,  hp:5  }) },
+  { weight:6, affinity:'endurance', rewards:()=>({ exp:5,  sp:-10}) },
+  { weight:5, affinity:'endurance', rewards:()=>({ exp:18, sp:-15}) },
+  { weight:8, affinity:'luck',      rewards:()=>({ exp:6              }) },
+  { weight:6, affinity:'luck',      rewards:()=>({ exp:30, sp:20    }) },
+  { weight:5, affinity:'luck',      rewards:()=>({ exp:10, hp:20    }) },
+  { weight:7, affinity:'arcane',    rewards:()=>({ exp:12, mp:10    }) },
+  { weight:5, affinity:'arcane',    rewards:()=>({ exp:20, mp:15    }) },
+  { weight:4, affinity:'arcane',    rewards:()=>({ exp:15, mp:-20   }) },
+  { weight:10,affinity:'nature',    rewards:()=>({ exp:2              }) },
+  { weight:8, affinity:'nature',    rewards:()=>({ exp:6              }) },
+  { weight:6, affinity:'nature',    rewards:()=>({ exp:8,  hp:5     }) },
+  { weight:5, affinity:'nature',    rewards:()=>({ exp:6,  hp:15, sp:10 }) },
+  { weight:8, affinity:'social',    rewards:()=>({ exp:5              }) },
+  { weight:6, affinity:'social',    rewards:()=>({ exp:8              }) },
+  { weight:5, affinity:'social',    rewards:()=>({ exp:20, hp:10    }) },
+  { weight:2, affinity:'social',    rewards:()=>({ exp:40, hp:30, sp:20}) },
+  // Risk events
+  { weight:5, affinity:'endurance', rewards:()=>({ exp:15, hp:-20, sp:-10}) },
+  { weight:4, affinity:'endurance', rewards:()=>({ exp:8,  hp:-12        }) },
+  { weight:3, affinity:'nature',    rewards:()=>({ exp:12, hp:-18        }) },
+  { weight:5, affinity:'arcane',    rewards:()=>({ exp:20, mp:-20        }) },
+  { weight:4, affinity:'arcane',    rewards:()=>({ exp:15, mp:-25        }) },
+  { weight:6, affinity:'endurance', rewards:()=>({ exp:18, sp:-25        }) },
+  { weight:4, affinity:'social',    rewards:()=>({ exp:22, sp:-20        }) },
+];
+
+// Minimal item pool for widget drops
+const W_ITEMS = [
+  { id:'round_stone', rarity:'common'   },{ id:'old_coin',    rarity:'common'   },
+  { id:'crow_feather',rarity:'common'   },{ id:'river_mud',   rarity:'common'   },
+  { id:'bent_nail',   rarity:'common'   },{ id:'dried_flower',rarity:'common'   },
+  { id:'smooth_glass',rarity:'common'   },{ id:'brass_button',rarity:'common'   },
+  { id:'acorn_cap',   rarity:'common'   },{ id:'knot_of_rope',rarity:'common'   },
+  { id:'odd_root',    rarity:'uncommon' },{ id:'warm_stone',  rarity:'uncommon' },
+  { id:'letter',      rarity:'uncommon' },{ id:'worn_map',    rarity:'uncommon' },
+  { id:'bone_dice',   rarity:'uncommon' },{ id:'worn_boot',   rarity:'uncommon' },
+  { id:'folded_note', rarity:'uncommon' },{ id:'black_ribbon',rarity:'uncommon' },
+  { id:'compass',     rarity:'rare'     },{ id:'glass_eye',   rarity:'rare'     },
+  { id:'silver_key',  rarity:'rare'     },{ id:'singing_stone',rarity:'rare'    },
+  { id:'ink_vial',    rarity:'rare'     },{ id:'old_crown',   rarity:'rare'     },
+  { id:'road_ghost',  rarity:'rare'     },{ id:'frozen_watch',rarity:'rare'     },
+  { id:'small_door',  rarity:'rare'     },{ id:'named_stone', rarity:'rare'     },
+  { id:'lantern_dark',rarity:'rare'     },{ id:'echo_stone',  rarity:'rare'     },
+  { id:'road_coin',   rarity:'rare'     },
+];
+
+function tryItemDrop(state, skills) {
+  const rareBoost = skills.has('rare_rate_up') ? 3 : 1;
+  const pool = W_ITEMS.map(i => ({
+    ...i,
+    weight: i.rarity==='common' ? 10 : i.rarity==='uncommon' ? 4 : 1*rareBoost
+  }));
+  const item = weightedPick(pool);
+  const expGain = item.rarity==='common' ? 5 : item.rarity==='uncommon' ? 20 : 80;
+  state.collection = state.collection || {};
+  state.collection[item.id] = (state.collection[item.id]||0) + 1;
+  state.itemsFound = (state.itemsFound||0) + 1;
+  gainExp(state, skills, expGain);
+}
+
+// ── Milestone tracking ────────────────────────────────
+const STEP_MILESTONES = [100,500,1000,5000,10000,25000,50000,100000];
+
+function checkMilestone(state, skills, lastMilestone) {
+  let lm = lastMilestone;
+  for (const m of STEP_MILESTONES) {
+    if (state.steps >= m && lm < m) {
+      lm = m;
+      gainExp(state, skills, m >= 10000 ? 200 : m >= 1000 ? 50 : 10);
+    }
+  }
+  return lm;
+}
+
+// ── Apply rewards ─────────────────────────────────────
+function applyRewards(state, skills, rewards, affinity) {
+  let expAmt = rewards.exp || 0;
+  if (affinity==='arcane' && skills.has('arcane_exp')) expAmt = Math.round(expAmt*1.5);
+  if (affinity==='social' && skills.has('social_exp')) expAmt = Math.round(expAmt*1.3);
+  if (skills.has('exp_windfall') && Math.random()<0.15) expAmt *= 2;
+  if (expAmt) gainExp(state, skills, expAmt);
+
+  const hpMax = maxHP(state.level)+(skills.has('hp_max_bonus')?40:0);
+  const mpMax = maxMP(state.level)+(skills.has('mp_max_bonus')?40:0);
+  const spMax = maxSP(state.level)+(skills.has('sp_max_bonus')?50:0);
+  if (rewards.hp) state.hp = Math.max(0, Math.min(hpMax, state.hp+rewards.hp));
+  if (rewards.mp) state.mp = Math.max(0, Math.min(mpMax, state.mp+rewards.mp));
+  if (rewards.sp) state.sp = Math.max(0, Math.min(spMax, state.sp+rewards.sp));
+}
+
+// ── Widget UI update ──────────────────────────────────
+function updateWidgetUI(state) {
+  const lv = state.level;
+  const skills = buildSkillSet(state);
+  const hpMax  = maxHP(lv)+(skills.has('hp_max_bonus')?40:0);
+  const mpMax  = maxMP(lv)+(skills.has('mp_max_bonus')?40:0);
+  const spMax  = maxSP(lv)+(skills.has('sp_max_bonus')?50:0);
+  const expMax = expToNext(lv);
+
+  // Portrait
+  const wImg   = document.getElementById('w-img');
+  const wEmoji = document.getElementById('w-emoji');
+  if (state.portrait) {
+    wImg.src = state.portrait;
+    wImg.classList.remove('hidden');
+    wEmoji.classList.add('hidden');
+  } else {
+    wImg.classList.add('hidden');
+    wEmoji.classList.remove('hidden');
+  }
+
+  document.getElementById('w-name').textContent  = state.name || '—';
+  document.getElementById('w-level').textContent = `The Traveler · Lv. ${lv}`;
+  document.getElementById('w-title').textContent = `"${state.activeTitle||'First Step'}"`;
+
+  document.getElementById('w-hp-val').textContent = `${fmt(state.hp)} / ${hpMax}`;
+  document.getElementById('w-mp-val').textContent = `${fmt(state.mp)} / ${mpMax}`;
+  document.getElementById('w-sp-val').textContent = `${fmt(state.sp)} / ${spMax}`;
+  document.getElementById('w-exp-val').textContent= `${fmt(state.exp)} / ${expMax}`;
+  document.getElementById('w-hp-bar').style.width = pct(state.hp, hpMax);
+  document.getElementById('w-mp-bar').style.width = pct(state.mp, mpMax);
+  document.getElementById('w-sp-bar').style.width = pct(state.sp, spMax);
+  document.getElementById('w-exp-bar').style.width= pct(state.exp, expMax);
+
+  document.getElementById('w-steps').textContent = fmt(state.steps);
+  document.getElementById('w-lv').textContent    = lv;
+  document.getElementById('w-day').textContent   = state.days || 1;
+  document.getElementById('w-items').textContent = state.itemsFound || 0;
+
+  const loc  = LOCATIONS[state.locationIndex] || LOCATIONS[0];
+  const next = LOCATIONS[Math.min(state.locationIndex+1, LOCATIONS.length-1)];
+  const atEnd = state.locationIndex >= LOCATIONS.length-1;
+  document.getElementById('w-loc').textContent       = loc.name;
+  document.getElementById('w-path-from').textContent = loc.name;
+  document.getElementById('w-path-to').textContent   = atEnd ? '—' : next.name;
+
+  const pathPct = atEnd ? 100 : Math.min(99, (state.locationSteps/loc.stepsNeeded)*100);
+  document.getElementById('w-path-fill').style.width = pathPct.toFixed(1)+'%';
+
+  // Status dot + banner
+  const dot    = document.getElementById('w-dot');
+  const banner = document.getElementById('w-rest-banner');
+  const statusTxt = document.getElementById('w-status');
+  const rateEl = document.getElementById('w-step-rate');
+
+  if (state.isResting) {
+    dot.className = 'widget-dot ' + (state.forcedRest ? 'forced' : 'resting');
+    statusTxt.textContent = state.forcedRest ? 'Down' : 'Resting';
+    banner.style.display = 'block';
+    banner.className = 'widget-rest-banner' + (state.forcedRest ? ' forced' : '');
+    banner.textContent = state.forcedRest ? 'Down for the count — resuming at dawn' : 'Resting until morning';
+    rateEl.textContent = '— steps / sec';
+  } else {
+    dot.className = 'widget-dot walking';
+    statusTxt.textContent = 'Walking';
+    banner.style.display = 'none';
+    rateEl.textContent = skills.has('bonus_steps') ? '1+ steps / sec' : '1 step / sec';
+  }
+}
+
+// ── Widget tick ───────────────────────────────────────
+let _wTick = 0;
+let _wEventCD = 0;
+let _wItemCD  = 0;
+let _wLastMile = 0;
+let _wInterval = null;
+
+function widgetTick() {
+  let state = load();
+  if (!state) return;
+
+  const skills  = buildSkillSet(state);
+  const resting = shouldRest();
+
+  // Rest transition
+  if (resting && !state.isResting) {
+    state.isResting  = true;
+    state.forcedRest = false;
+    state.days       = (state.days||1) + 1;
+    if (skills.has('day_bonus')) gainExp(state, skills, state.days * 5);
+    const hpMax = maxHP(state.level)+(skills.has('hp_max_bonus')?40:0);
+    const mpMax = maxMP(state.level)+(skills.has('mp_max_bonus')?40:0);
+    const spMax = maxSP(state.level)+(skills.has('sp_max_bonus')?50:0);
+    state.hp = hpMax; state.mp = mpMax; state.sp = spMax;
+    save(state); updateWidgetUI(state); return;
+  }
+
+  if (!resting && state.isResting) {
+    state.isResting  = false;
+    state.forcedRest = false;
+    save(state); updateWidgetUI(state); return;
+  }
+
+  if (state.isResting) { updateWidgetUI(state); return; }
+
+  // ── Walking ───────────────────────────────────────
+  _wTick++;
+  state.steps         = (state.steps||0) + 1;
+  state.locationSteps = (state.locationSteps||0) + 1;
+  gainExp(state, skills, 1);
+
+  // SP regen
+  const spMax = maxSP(state.level)+(skills.has('sp_max_bonus')?50:0);
+  const spRegen = skills.has('sure_footed') ? 0.1 : 0.05;
+  state.sp = Math.min(spMax, state.sp+spRegen);
+
+  // HP regen
+  if (skills.has('hp_regen')) {
+    const hpMax = maxHP(state.level)+(skills.has('hp_max_bonus')?40:0);
+    state.hp = Math.min(hpMax, state.hp+0.02);
+  }
+
+  // Iron Stride
+  if (skills.has('bonus_steps') && _wTick%5===0 && state.sp>=spMax) {
+    state.steps++; state.locationSteps++; gainExp(state, skills, 1);
+  }
+
+  // Golden Mile
+  if (skills.has('mile_bonus') && state.steps%500===0 && Math.random()<0.3) {
+    tryItemDrop(state, skills);
+  }
+
+  _wLastMile = checkMilestone(state, skills, _wLastMile);
+  checkLocation(state, skills);
+  checkSkills(state);
+  checkTitles(state);
+
+  // Event
+  _wEventCD--;
+  if (_wEventCD <= 0) {
+    const ev = weightedPick(W_EVENTS);
+    state.affinities = state.affinities || {};
+    state.affinities[ev.affinity] = (state.affinities[ev.affinity]||0) + 1;
+    const rewards = ev.rewards();
+    applyRewards(state, skills, rewards, ev.affinity);
+    state.eventsFound = (state.eventsFound||0) + 1;
+
+    // Beast-Familiar
+    if (ev.affinity==='nature' && skills.has('beast_heal')) {
+      const hpMax = maxHP(state.level)+(skills.has('hp_max_bonus')?40:0);
+      state.hp = Math.min(hpMax, state.hp+10);
+      state.sp = Math.min(spMax, state.sp+15);
+    }
+
+    // Re-check skills after affinity update
+    checkSkills(state);
+
+    // 0 HP forced rest
+    if (state.hp <= 0) {
+      state.hp = 0;
+      state.isResting  = true;
+      state.forcedRest = true;
+      state.forcedRests = (state.forcedRests||0) + 1;
+      state.days = (state.days||1) + 1;
+      const hpMax = maxHP(state.level)+(skills.has('hp_max_bonus')?40:0);
+      state.hp = Math.floor(hpMax * 0.5);
+      state.mp = maxMP(state.level)+(skills.has('mp_max_bonus')?40:0);
+      state.sp = spMax;
+      checkTitles(state);
+      save(state); updateWidgetUI(state); return;
+    }
+
+    const socialMod = skills.has('social_freq') ? 0.8 : 1;
+    const arcaneMod = skills.has('arcane_freq') ? 0.8 : 1;
+    _wEventCD = Math.round((45+Math.random()*45)*Math.min(socialMod,arcaneMod));
+  }
+
+  // Item drop
+  _wItemCD--;
+  if (_wItemCD <= 0) {
+    const rateBoost = skills.has('item_rate_up') ? 0.75 : 1;
+    _wItemCD = Math.round((120+Math.random()*120)*rateBoost);
+    tryItemDrop(state, skills);
+  }
+
+  if (_wTick%30===0) save(state);
+  updateWidgetUI(state);
+}
+
+// ── Init ─────────────────────────────────────────────
+(function init() {
+  const state = load();
+
+  if (!state) {
+    document.getElementById('w-nosave').classList.remove('hidden');
+    document.getElementById('w-game').classList.add('hidden');
+    return;
+  }
+
+  // Restore milestone tracker
+  _wLastMile = 0;
+  for (const m of [100,500,1000,5000,10000,25000,50000,100000]) {
+    if (state.steps >= m) _wLastMile = m;
+  }
+
+  // Stagger cooldowns so widget doesn't spam on load
+  _wEventCD = 20 + Math.floor(Math.random()*20);
+  _wItemCD  = 40 + Math.floor(Math.random()*40);
+
+  document.getElementById('w-nosave').classList.add('hidden');
+  document.getElementById('w-game').classList.remove('hidden');
+
+  updateWidgetUI(state);
+
+  if (_wInterval) clearInterval(_wInterval);
+  _wInterval = setInterval(widgetTick, 1000);
+})();
+</script>
+</body>
+</html>
