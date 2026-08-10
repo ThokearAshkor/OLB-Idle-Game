@@ -34,12 +34,35 @@
     --panel-border: #C4A97D;
     --inset-bg:     #E2D5BC;
   }
+	.hidden { display: none !important; }
 
-  html, body { height: 100%; background-color: var(--page-bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
-  .hidden { display: none !important; }
+  html, body {
+    height: 100%;
+}
 
-  /* ══ ONBOARDING ══════════════════════════════════════ */
-  #onboarding { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--page-bg); padding: 32px 16px; }
+#onboarding {
+    background-color: var(--page-bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+}
+
+#game {
+    background-color: var(--page-bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
 
   .journal-cover {
     background: var(--panel-bg); border: 2px solid var(--panel-border); border-radius: 4px;
@@ -66,9 +89,6 @@
   .begin-btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .cover-footer { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--parchment-deep); font-family: var(--font-data); font-size: 10px; color: var(--ink-ghost); letter-spacing: 0.06em; text-align: center; }
 
-  /* ══ GAME SHELL ══════════════════════════════════════ */
-  #game { display: flex; flex-direction: column; min-height: 100vh; }
-
   .page-header { background: var(--ink); color: var(--parchment-mid); padding: 12px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--leather); flex-shrink: 0; }
   .wordmark { font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: 0.04em; color: var(--parchment); }
   .wordmark span { color: var(--leather-light); }
@@ -83,8 +103,13 @@
   .section-label { font-family: var(--font-data); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-ghost); margin-bottom: 12px; }
 
   .character-block { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px 20px 20px; border-bottom: 1px solid var(--parchment-deep); background: var(--inset-bg); flex-shrink: 0; }
-  .portrait-ring { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--leather); background: var(--parchment-deep); display: flex; align-items: center; justify-content: center; }
+  .portrait-ring { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--leather); background: var(--parchment-deep); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; cursor: pointer; flex-shrink: 0; }
+  .portrait-ring:hover .portrait-hover { opacity: 1; }
+  .portrait-hover { position: absolute; inset: 0; border-radius: 50%; background: rgba(58,50,38,0.65); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; font-family: var(--font-data); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--parchment); text-align: center; padding: 6px; pointer-events: none; }
+  .portrait-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
   .portrait-figure { font-size: 36px; line-height: 1; user-select: none; }
+  .portrait-remove { font-family: var(--font-data); font-size: 9px; letter-spacing: 0.06em; color: var(--ink-ghost); background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; margin-top: -4px; transition: color 0.15s; }
+  .portrait-remove:hover { color: var(--wax); }
   .char-name { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--ink); letter-spacing: 0.02em; text-align: center; }
   .char-class { font-family: var(--font-data); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-ghost); }
   .char-title-badge { background: var(--wax-light); border: 1px solid var(--wax); color: var(--wax); font-family: var(--font-body); font-style: italic; font-size: 12px; padding: 3px 10px; border-radius: 20px; text-align: center; }
@@ -280,7 +305,13 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="character-block">
-        <div class="portrait-ring"><span class="portrait-figure">🧙</span></div>
+        <div class="portrait-ring" id="portrait-ring" title="Click to change portrait">
+          <span class="portrait-figure" id="portrait-emoji">🧙</span>
+          <img class="portrait-img hidden" id="portrait-img" alt="Character portrait">
+          <div class="portrait-hover">Change<br>portrait</div>
+        </div>
+        <input type="file" id="portrait-upload" accept="image/*" style="display:none">
+        <button class="portrait-remove hidden" id="portrait-remove">Remove portrait</button>
         <div class="char-name" id="ui-char-name">—</div>
         <div class="char-class" id="ui-char-class">The Traveler · Level 1</div>
         <div class="char-title-badge" id="ui-char-title">"First Step"</div>
@@ -517,8 +548,27 @@ const TITLES = [
   { id: 'level5',      label: 'Road-Worn',             hint: 'Reach level 5.',                           condition: s => s.level >= 5         },
   { id: 'level10',     label: 'Far-Travelled',         hint: 'Reach level 10.',                          condition: s => s.level >= 10        },
   { id: 'level20',     label: 'The Weathered',         hint: 'Reach level 20.',                          condition: s => s.level >= 20        },
-  { id: 'skilled',     label: 'Marked by the Road',    hint: 'Unlock your first skill.',                 condition: s => s.skillsUnlocked.length >= 1 },
-  { id: 'adept',       label: 'Road-Adept',            hint: 'Unlock 5 skills.',                         condition: s => s.skillsUnlocked.length >= 5 },
+  { id: 'skilled',       label: 'Marked by the Road',      hint: 'Unlock your first skill.',                      condition: s => s.skillsUnlocked.length >= 1        },
+  { id: 'adept',         label: 'Road-Adept',              hint: 'Unlock 5 skills.',                              condition: s => s.skillsUnlocked.length >= 5        },
+  { id: 'master',        label: 'The Road-Touched',        hint: 'Unlock 10 skills.',                             condition: s => s.skillsUnlocked.length >= 10       },
+  // Steps
+  { id: 'fifty_thou',    label: 'Fifty Thousand Steps',    hint: 'Walk 50,000 steps.',                            condition: s => s.steps >= 50000                    },
+  { id: 'hundred_thou',  label: 'The Endless',             hint: 'Walk 100,000 steps.',                           condition: s => s.steps >= 100000                   },
+  // Levels
+  { id: 'level30',       label: 'Deeply Travelled',        hint: 'Reach level 30.',                               condition: s => s.level >= 30                       },
+  { id: 'level50',       label: 'The Inexhaustible',       hint: 'Reach level 50.',                               condition: s => s.level >= 50                       },
+  // Days
+  { id: 'month',         label: 'A Month on the Road',     hint: 'Journey for 30 days.',                          condition: s => s.days >= 30                        },
+  // Items
+  { id: 'many_things',   label: 'Keeper of Strange Things',hint: 'Find 50 items.',                                condition: s => s.itemsFound >= 50                  },
+  { id: 'rare_finder',   label: 'The Fortunate',           hint: 'Find your first rare item.',                    condition: s => Object.entries(s.collection).some(([id]) => ITEMS.find(i=>i.id===id)?.rarity==='rare') },
+  // Forced rest
+  { id: 'down_once',     label: 'What Does Not Kill',      hint: 'Be forced to rest by the road.',                condition: s => s.forcedRests >= 1                  },
+  { id: 'down_five',     label: 'Hard-Won Miles',          hint: 'Be forced to rest 5 times.',                    condition: s => s.forcedRests >= 5                  },
+  // Locations
+  { id: 'reach_ashfield',label: 'Beyond the Crossing',     hint: 'Reach The Ashfield.',                           condition: s => s.locationIndex >= 4                },
+  { id: 'reach_moors',   label: 'Walker of Pale Places',   hint: 'Reach The Pale Moors.',                         condition: s => s.locationIndex >= 7                },
+  { id: 'reach_wood',    label: 'Into the Wandering Wood', hint: 'Reach The Wandering Wood.',                     condition: s => s.locationIndex >= 9                },
 ];
 
 // ── Items ─────────────────────────────────────────────
@@ -543,8 +593,31 @@ const ITEMS = [
   { id: 'silver_key',     name: 'Silver Key',                rarity: 'rare',     minLevel: 7,  desc: 'No visible lock. The metal is warm to the touch.' },
   { id: 'singing_stone',  name: 'Stone That Hums at Dusk',   rarity: 'rare',     minLevel: 8,  desc: 'A single, low note. Not unpleasant.' },
   { id: 'ink_vial',       name: 'Vial of Ink That Moves',    rarity: 'rare',     minLevel: 9,  desc: 'The ink shifts inside the sealed glass with no apparent cause.' },
-  { id: 'old_crown',      name: 'Tarnished Circlet',         rarity: 'rare',     minLevel: 12, desc: 'Too small for a man. Too large for a child. Unknown metal.' },
-  { id: 'road_ghost',     name: 'Bottled Road Mist',         rarity: 'rare',     minLevel: 15, desc: 'The mist from a crossroads at midnight. It presses against the glass.' },
+  { id: 'old_crown',        name: 'Tarnished Circlet',              rarity: 'rare',     minLevel: 12, desc: 'Too small for a man. Too large for a child. Unknown metal.' },
+  { id: 'road_ghost',       name: 'Bottled Road Mist',              rarity: 'rare',     minLevel: 15, desc: 'The mist from a crossroads at midnight. It presses against the glass.' },
+  // Level 15–20 uncommon
+  { id: 'worn_boot',        name: 'Boot With No Pair',              rarity: 'uncommon', minLevel: 15, desc: 'Well-made. Extremely worn. The other one is somewhere on this same road.' },
+  { id: 'folded_note',      name: 'Note Written in Future Tense',   rarity: 'uncommon', minLevel: 16, desc: 'It describes things that have not happened yet. Some of them already have.' },
+  { id: 'black_ribbon',     name: 'Black Ribbon, Still Tied',       rarity: 'uncommon', minLevel: 17, desc: 'In a bow around nothing. You do not untie it.' },
+  { id: 'heavy_coin',       name: 'Coin Too Heavy for Its Size',    rarity: 'uncommon', minLevel: 18, desc: 'Made of something denser than any metal you know by name.' },
+  { id: 'cracked_lens',     name: 'Cracked Monocle Lens',           rarity: 'uncommon', minLevel: 19, desc: 'Things look clearer through the crack than through the glass.' },
+  // Level 15–20 rare
+  { id: 'frozen_watch',     name: 'Pocketwatch Stopped at Dusk',    rarity: 'rare',     minLevel: 15, desc: 'The hands do not move. The ticking continues.' },
+  { id: 'small_door',       name: 'Door That Fits in a Pocket',     rarity: 'rare',     minLevel: 17, desc: 'Fully functional. Leads somewhere different each time. You have not opened it twice.' },
+  { id: 'named_stone',      name: 'Stone with a Name Carved In',    rarity: 'rare',     minLevel: 18, desc: 'Your name. In handwriting you do not recognise. The stone is very old.' },
+  // Level 20–25 uncommon
+  { id: 'road_dust',        name: 'Vial of Road Dust',              rarity: 'uncommon', minLevel: 20, desc: 'Collected from ten different roads. It moves when the vial is still.' },
+  { id: 'unfinished_map',   name: 'Half-Drawn Map',                 rarity: 'uncommon', minLevel: 21, desc: 'Someone ran out of road before they ran out of map.' },
+  { id: 'travellers_oath',  name: 'Traveller\'s Oath (Unsigned)',   rarity: 'uncommon', minLevel: 22, desc: 'A formal agreement with the road. The other party\'s signature line is blank.' },
+  { id: 'mirror_shard',     name: 'Mirror That Shows Yesterday',    rarity: 'uncommon', minLevel: 23, desc: 'Not a metaphor. You checked.' },
+  // Level 20–25 rare
+  { id: 'lantern_dark',     name: 'Lantern That Burns Cold',        rarity: 'rare',     minLevel: 20, desc: 'It illuminates nothing but casts clear shadows.' },
+  { id: 'echo_stone',       name: 'Echo Stone',                     rarity: 'rare',     minLevel: 22, desc: 'Speak into it and it answers, eventually, in a voice almost your own.' },
+  { id: 'road_coin',        name: 'The Road\'s Own Coin',           rarity: 'rare',     minLevel: 24, desc: 'Has no heads or tails. Has no face. Has weight far exceeding its size. Appeared in your pack with no explanation.' },
+  // Level 25–30 rare
+  { id: 'first_boot',       name: 'Boot from the First Journey',    rarity: 'rare',     minLevel: 25, desc: 'Impossibly preserved. Not yours — or perhaps an earlier version of yours.' },
+  { id: 'hollow_compass',   name: 'Compass with No Needle',         rarity: 'rare',     minLevel: 27, desc: 'The interior is not empty. Something moves in there that is not a needle.' },
+  { id: 'last_mile_stone',  name: 'Milestone Marked Zero',          rarity: 'rare',     minLevel: 29, desc: 'A milestone counting down to something. You found it at zero. You did not find what it was counting toward.' },
 ];
 
 // ── Events ────────────────────────────────────────────
@@ -717,6 +790,61 @@ const EVENTS = [
     rewards: () => ({ exp: 30, hp: -25 }) },
 ];
 
+// ── Location-specific events ──────────────────────────
+// Keyed by locationIndex. Fire at 30% chance instead of a regular event.
+const LOCATION_EVENTS = {
+  0: [ // The First Road
+    { affinity: 'endurance', text: () => `The gate of wherever you came from is still visible behind you. You do not look back again.`, rewards: () => ({ exp: 5 }) },
+    { affinity: 'social',    text: () => `Another traveler sets out the same direction. You walk together for a while before the road separates you without either of you noticing.`, rewards: () => ({ exp: 8 }) },
+    { affinity: 'luck',      text: () => `Something falls out of your pack and lands perfectly upright. You take this as a good sign.`, rewards: () => ({ exp: 4 }) },
+  ],
+  1: [ // Millbrook Crossing
+    { affinity: 'nature',    text: () => `The mill wheel turns slowly below you. Something about the rhythm of it is deeply settling.`, rewards: () => ({ exp: 8, sp: 10 }) },
+    { affinity: 'arcane',    text: () => `The stream below the crossing runs in two directions at once. The miller, when you point this out, says he stopped noticing years ago.`, rewards: () => ({ exp: 12, mp: 8 }) },
+    { affinity: 'social',    text: () => `The miller's child hands you something wrapped in cloth without being asked. Inside: a piece of bread and a single dried plum. You eat both.`, rewards: () => ({ exp: 10, hp: 15 }) },
+  ],
+  2: [ // The Hollow Road
+    { affinity: 'arcane',    text: () => `The willows on either side lean inward overhead. Walking the Hollow Road feels like walking through something's throat.`, rewards: () => ({ exp: 15, mp: -10 }) },
+    { affinity: 'nature',    text: () => `Something in the branches above is watching you. It has been watching you for half a mile. When you finally stop and look directly at it, there is only a branch.`, rewards: () => ({ exp: 12 }) },
+    { affinity: 'endurance', text: () => `The road narrows here until your shoulders nearly brush the willows on both sides. You keep your pace and do not think about it.`, rewards: () => ({ exp: 10, sp: -8 }) },
+  ],
+  3: [ // Greymere Crossing
+    { affinity: 'luck',      text: () => `Three of the signpost's four directions are scratched off. You pick the remaining one. It seems as good a reason as any.`, rewards: () => ({ exp: 10 }) },
+    { affinity: 'social',    text: () => `A group of travelers at the crossing, all stopped, all looking at the signpost. No one speaks. You pass through them without stopping.`, rewards: () => ({ exp: 8 }) },
+    { affinity: 'arcane',    text: () => `Standing at the exact centre of the crossroads you feel, briefly, that you are in four places at once. Then a cart passes and you are just standing in the road.`, rewards: () => ({ exp: 20, mp: 12 }) },
+  ],
+  4: [ // The Ashfield
+    { affinity: 'nature',    text: () => `The grey wheat sways without wind in perfect unison. You walk between the rows quickly and do not touch any of it.`, rewards: () => ({ exp: 15, mp: -12 }) },
+    { affinity: 'social',    text: () => `A farmer watches you from a distance. When you raise your hand he raises his. When you lower it, he lowers his. You break the pattern by looking away first.`, rewards: () => ({ exp: 10 }) },
+    { affinity: 'arcane',    text: () => `One patch of the grey wheat is green. Just one patch, maybe ten stalks. You mark where it is and it is gone when you look back.`, rewards: () => ({ exp: 22, mp: 15 }) },
+  ],
+  5: [ // Duskwatch Tower
+    { affinity: 'arcane',    text: () => `Every window in the tower has a candle. You count them. You count them again. The number is different each time.`, rewards: () => ({ exp: 20, mp: -20 }) },
+    { affinity: 'endurance', text: () => `The tower's shadow falls across the road regardless of where the sun is. You walk through it quickly. It is cold inside the shadow.`, rewards: () => ({ exp: 15, hp: -10 }) },
+    { affinity: 'luck',      text: () => `At the base of the tower, a single candle sits on a stone outside. It has not been lit by anyone you can see. You walk on before you have to think about it too hard.`, rewards: () => ({ exp: 18 }) },
+  ],
+  6: [ // The Sunken Road
+    { affinity: 'nature',    text: () => `The plants down here are larger than they should be — leaves the size of shields, roots like fallen trees. Everything grows toward you slightly as you pass.`, rewards: () => ({ exp: 18, hp: -8 }) },
+    { affinity: 'endurance', text: () => `The sky is a ribbon above. Walls of earth rise on either side. The road goes down and you follow it, because that is what you do.`, rewards: () => ({ exp: 20, sp: -15 }) },
+    { affinity: 'arcane',    text: () => `Sound behaves differently in the Sunken Road. Your footsteps echo wrong — a half-second late, slightly too loud, as if something is mimicking them nearby.`, rewards: () => ({ exp: 25, mp: -18 }) },
+  ],
+  7: [ // The Pale Moors
+    { affinity: 'endurance', text: () => `The moors offer no shelter, no shade, no landmarks. You walk by feel and direction and something that might be instinct. An hour passes that could have been three.`, rewards: () => ({ exp: 25, sp: -20 }) },
+    { affinity: 'arcane',    text: () => `Something large moves beneath the moor's surface. You see the ground shift and settle. You do not stop walking.`, rewards: () => ({ exp: 30, mp: -22, hp: -10 }) },
+    { affinity: 'nature',    text: () => `A single tree on the pale moors, alone, with no explanation for how it came to be here. Birds sit in it. They watch you pass.`, rewards: () => ({ exp: 20, hp: 10 }) },
+  ],
+  8: [ // Thornwall Village
+    { affinity: 'social',    text: () => `The villagers are friendly. Specifically friendly. You cannot find a single person here who will make eye contact for more than a moment.`, rewards: () => ({ exp: 18, mp: -12 }) },
+    { affinity: 'social',    text: () => `Someone presses a warm meal into your hands before you can object. It is good. You do not ask what is in it.`, rewards: () => ({ exp: 20, hp: 25, sp: 15 }) },
+    { affinity: 'arcane',    text: () => `The village does not appear on any map you have seen. When you ask a local about this they smile and say it prefers it that way.`, rewards: () => ({ exp: 28, mp: 20 }) },
+  ],
+  9: [ // The Wandering Wood
+    { affinity: 'arcane',    text: () => `The trees have moved again. You know this because the one with the split trunk was on your left yesterday. It is on your right today.`, rewards: () => ({ exp: 30, mp: -25 }) },
+    { affinity: 'nature',    text: () => `The wood is quiet in a way that feels intentional. Not the quiet of nothing present — the quiet of many things listening.`, rewards: () => ({ exp: 25, hp: -12 }) },
+    { affinity: 'endurance', text: () => `You have stopped trying to track your path. You walk. The wood will let you out when it decides to. Until then you keep moving.`, rewards: () => ({ exp: 35, sp: -20 }) },
+  ],
+};
+
 // ── Default state ─────────────────────────────────────
 function defaultState(name) {
   return {
@@ -730,7 +858,7 @@ function defaultState(name) {
     skillsUnlocked: [],   // array of effect strings
     affinities: { endurance: 0, luck: 0, arcane: 0, nature: 0, social: 0 },
     locationIndex: 0, locationSteps: 0,
-    log: [], isResting: false, forcedRest: false, lastSaved: Date.now(),
+    log: [], isResting: false, forcedRest: false, forcedRests: 0, portrait: null, lastSaved: Date.now(),
   };
 }
 
@@ -999,14 +1127,22 @@ function tick() {
   if (_eventCooldown <= 0) {
     const socialFreqBoost = hasSkill('social_freq') ? 0.8 : 1;
     const arcaneFreqBoost = hasSkill('arcane_freq') ? 0.8 : 1;
-    // Pick from eligible events, frequency-adjusted
-    const pool = EVENTS.map(e => ({
-      ...e,
-      weight: e.weight
-        * (e.affinity === 'social' ? (1 / socialFreqBoost) : 1)
-        * (e.affinity === 'arcane' ? (1 / arcaneFreqBoost) : 1)
-    }));
-    const ev = weightedPick(pool);
+
+    // 30% chance to fire a location-specific event if one exists here
+    const locEvents = LOCATION_EVENTS[state.locationIndex];
+    let ev;
+    if (locEvents && Math.random() < 0.30) {
+      ev = locEvents[Math.floor(Math.random() * locEvents.length)];
+    } else {
+      // Pick from general pool, frequency-adjusted
+      const pool = EVENTS.map(e => ({
+        ...e,
+        weight: e.weight
+          * (e.affinity === 'social' ? (1 / socialFreqBoost) : 1)
+          * (e.affinity === 'arcane' ? (1 / arcaneFreqBoost) : 1)
+      }));
+      ev = weightedPick(pool);
+    }
     const rewards = ev.rewards();
     state.affinities[ev.affinity] = (state.affinities[ev.affinity] || 0) + 1;
     applyRewards(rewards, ev.affinity);
@@ -1024,6 +1160,7 @@ function tick() {
       state.hp = 0;
       state.isResting = true;
       state.forcedRest = true;
+      state.forcedRests = (state.forcedRests || 0) + 1;
       state.days++;
       // Partial restore: 50% HP, full MP/SP
       const hpMax = maxHP(state.level) + (hasSkill('hp_max_bonus') ? 40 : 0);
@@ -1273,6 +1410,68 @@ function switchPanel(name) {
   if (name === 'titles')     renderTitlesPanel();
 }
 
+// ── Portrait upload ───────────────────────────────────
+function applyPortrait() {
+  const img   = document.getElementById('portrait-img');
+  const emoji = document.getElementById('portrait-emoji');
+  const removeBtn = document.getElementById('portrait-remove');
+  if (state.portrait) {
+    img.src = state.portrait;
+    img.classList.remove('hidden');
+    emoji.classList.add('hidden');
+    removeBtn.classList.remove('hidden');
+  } else {
+    img.classList.add('hidden');
+    emoji.classList.remove('hidden');
+    removeBtn.classList.add('hidden');
+  }
+}
+
+function initPortrait() {
+  const ring   = document.getElementById('portrait-ring');
+  const upload = document.getElementById('portrait-upload');
+  const removeBtn = document.getElementById('portrait-remove');
+
+  ring.addEventListener('click', () => upload.click());
+
+  upload.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      // Resize to 160×160 via canvas before storing
+      const image = new Image();
+      image.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 160; canvas.height = 160;
+        const ctx = canvas.getContext('2d');
+        // Cover-crop: scale to fill square
+        const size = Math.min(image.width, image.height);
+        const sx = (image.width  - size) / 2;
+        const sy = (image.height - size) / 2;
+        ctx.drawImage(image, sx, sy, size, size, 0, 0, 160, 160);
+        state.portrait = canvas.toDataURL('image/jpeg', 0.82);
+        applyPortrait();
+        save();
+      };
+      image.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+    // Reset input so the same file can be re-selected
+    upload.value = '';
+  });
+
+  removeBtn.addEventListener('click', e => {
+    e.stopPropagation(); // don't trigger ring click
+    state.portrait = null;
+    applyPortrait();
+    save();
+  });
+
+  // Apply on load if portrait already saved
+  applyPortrait();
+}
+
 // ── Start / init ──────────────────────────────────────
 function startGame() {
   document.getElementById('onboarding').classList.add('hidden');
@@ -1294,6 +1493,7 @@ function startGame() {
 
   rebuildLog();
   updateUI();
+  initPortrait();
   if (tickInterval) clearInterval(tickInterval);
   tickInterval = setInterval(tick, 1000);
 }
