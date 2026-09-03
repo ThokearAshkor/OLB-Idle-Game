@@ -201,6 +201,411 @@
   .reward-chip.chip-skill { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
   .reward-chip.chip-cost  { background: #F9EDE8; border-color: #C0604A; color: #C0604A; }
 
+  .log-scroll { overflow-y: auto; max-height: none; }
+  .log-load-more-wrap { display: flex; justify-content: center; margin-top: 8px; padding-top: 8px; }
+  .log-load-more { font-family: var(--font-data); font-size: 10px; background: transparent; border: 1px solid var(--parchment-deep); color: var(--ink-faded); padding: 7px 12px; border-radius: 4px; cursor: pointer; }
+  .log-load-more:hover { border-color: var(--leather); color: var(--leather); }
+  .restart-section { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--parchment-deep); text-align: center; }
+  .restart-hint { font-size: 11px; color: var(--ink-ghost); line-height: 1.45; margin: 8px 0 12px; }
+  .restart-btn-row { display: flex; justify-content: center; gap: 8px; }
+  .restart-btn { font-family: var(--font-data); font-size: 10px; background: transparent; border: 1px solid var(--parchment-deep); color: var(--ink-faded); padding: 7px 12px; border-radius: 4px; cursor: pointer; }
+  .restart-btn:hover { border-color: var(--leather); color: var(--leather); }
+  .restart-btn--confirm { border-color: #C0604A; color: #C0604A; }
+
+  /* ── Skills panel ──────────────────────────────────── */
+  .panel-title { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .panel-subtitle { font-size: 13px; color: var(--ink-faded); font-style: italic; margin-bottom: 24px; border-bottom: 2px solid var(--parchment-deep); padding-bottom: 12px; }
+
+  .affinity-block { margin-bottom: 28px; }
+  .affinity-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .affinity-icon { font-size: 18px; }
+  .affinity-name { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--ink); }
+  .affinity-count { font-family: var(--font-data); font-size: 11px; color: var(--ink-ghost); margin-left: auto; }
+
+  .affinity-bar-track { height: 5px; background: var(--parchment-deep); border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
+  .affinity-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+  .skill-list { display: flex; flex-direction: column; gap: 8px; }
+  .skill-card { background: var(--panel-bg); border: 1px solid var(--parchment-deep); border-radius: 6px; padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start; }
+  .skill-card.locked { opacity: 0.45; filter: grayscale(0.3); }
+  .skill-card.unlocked { border-left: 3px solid var(--moss); }
+
+  .skill-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .skill-info { flex: 1; }
+  .skill-name { font-family: var(--font-body); font-weight: 600; font-size: 13px; color: var(--ink); margin-bottom: 2px; }
+  .skill-desc { font-size: 12px; color: var(--ink-faded); line-height: 1.4; font-style: italic; }
+  .skill-req { font-family: var(--font-data); font-size: 10px; color: var(--ink-ghost); margin-top: 4px; letter-spacing: 0.04em; }
+  .skill-badge { font-family: var(--font-data); font-size: 9px; padding: 2px 7px; border-radius: 10px; flex-shrink: 0; margin-top: 3px; }
+  .skill-badge.unlocked { background: var(--moss-light); color: var(--moss); border: 1px solid var(--moss); }
+  .skill-badge.locked   { background: var(--parchment-deep); color: var(--ink-ghost); border: 1px solid var(--parchment-deep); }
+
+  /* ── Collection panel ──────────────────────────────── */
+  .collection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .item-card { background: var(--panel-bg); border: 1px solid var(--parchment-deep); border-radius: 6px; padding: 12px 14px; }
+  .item-card.rarity-uncommon { border-left: 3px solid var(--leather); }
+  .item-card.rarity-rare     { border-left: 3px solid var(--wax); background: var(--wax-light); }
+  .item-name { font-family: var(--font-body); font-weight: 600; font-size: 13px; color: var(--ink); margin-bottom: 4px; }
+  .item-desc { font-size: 12px; color: var(--ink-faded); font-style: italic; line-height: 1.4; }
+  .item-rarity { font-family: var(--font-data); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+  .item-rarity.common   { color: var(--ink-ghost); }
+  .item-rarity.uncommon { color: var(--leather); }
+  .item-rarity.rare     { color: var(--wax); }
+  .item-count { font-family: var(--font-data); font-size: 10px; color: var(--ink-ghost); margin-top: 6px; }
+
+  .empty-state { text-align: center; padding: 48px 24px; color: var(--ink-ghost); font-style: italic; font-size: 14px; }
+  .empty-state .empty-icon { font-size: 32px; display: block; margin-bottom: 12px; }
+
+  /* ── Titles panel ──────────────────────────────────── */
+  .titles-list { display: flex; flex-direction: column; gap: 10px; }
+  .title-card { background: var(--panel-bg); border: 1px solid var(--parchment-deep); border-radius: 6px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; }
+  .title-card.earned { border-left: 3px solid var(--wax); }
+  .title-card.locked { opacity: 0.4; }
+  .title-card.active-title { background: var(--wax-light); border-color: var(--wax); }
+  .title-icon { font-size: 20px; flex-shrink: 0; }
+  .title-info { flex: 1; }
+  .title-name { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--ink); font-style: italic; }
+  .title-hint { font-size: 12px; color: var(--ink-faded); margin-top: 2px; }
+  .title-active-badge { font-family: var(--font-data); font-size: 9px; background: var(--wax); color: var(--parchment); padding: 2px 8px; border-radius: 10px; flex-shrink: 0; letter-spacing: 0.06em; }
+  .title-locked-badge { font-family: var(--font-data); font-size: 9px; background: var(--parchment-deep); color: var(--ink-ghost); padding: 2px 8px; border-radius: 10px; flex-shrink: 0; letter-spacing: 0.06em; }
+
+  /* active title selector button */
+  .title-set-btn { font-family: var(--font-data); font-size: 9px; background: transparent; border: 1px solid var(--wax); color: var(--wax); padding: 2px 8px; border-radius: 10px; cursor: pointer; flex-shrink: 0; letter-spacing: 0.06em; transition: background 0.15s; }
+  .title-set-btn:hover { background: var(--wax); color: var(--parchment); }
+
+  /* ── Status bar ────────────────────────────────────── */
+  .status-bar { background: var(--ink); padding: 8px 28px; display: flex; align-items: center; gap: 20px; border-top: 2px solid var(--leather); flex-shrink: 0; }
+  .status-indicator { display: flex; align-items: center; gap: 6px; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--moss); }
+  .status-dot.resting { background: var(--blue); animation: none; }
+  .status-dot.walking { animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+  .status-txt { font-family: var(--font-data); font-size: 11px; color: var(--parchment-mid); letter-spacing: 0.04em; }
+  .status-sep { color: var(--ink-ghost); font-size: 12px; }
+  .ml-auto { margin-left: auto; }
+</style>
+</head>
+<body>
+
+<div class="tlr-app">
+
+<!-- ══ ONBOARDING ══════════════════════════════════════ -->
+<div id="onboarding">
+  <div class="journal-cover">
+    <div class="cover-eyebrow">OLB Idle · A traveler's tale</div>
+    <div class="cover-title">The<br><span>Long Road</span></div>
+    <div class="cover-rule"></div>
+    <p class="cover-intro">Every journey begins with a single step, and every traveler with a name. The road does not care who you were before — only who you become upon it.</p>
+    <div class="field-group">
+      <label class="field-label" for="name-input">Your traveler's name</label>
+      <input class="field-input" id="name-input" type="text" maxlength="24" placeholder="Enter a name..." autocomplete="off" spellcheck="false">
+      <div class="field-hint">Between 2 and 24 characters. Choose wisely — it travels with you.</div>
+    </div>
+    <button class="begin-btn" id="begin-btn" disabled>Begin the journey</button>
+    <div class="cover-footer">The Traveler &middot; Class I &middot; OLB Forum</div>
+  </div>
+</div>
+
+<!-- ══ GAME ══════════════════════════════════════════ -->
+<div id="game" class="hidden">
+
+  <header class="page-header">
+    <div class="wordmark">The <span>Long Road</span></div>
+    <div class="header-meta">OLB Idle &middot; The Traveler</div>
+  </header>
+
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="character-block">
+        <div class="portrait-ring" id="portrait-ring" title="Click to change portrait">
+          <span class="portrait-figure" id="portrait-emoji">🧙</span>
+          <img class="portrait-img hidden" id="portrait-img" alt="Character portrait">
+          <div class="portrait-hover">Change<br>portrait</div>
+        </div>
+        <input type="file" id="portrait-upload" accept="image/*" style="display:none">
+        <button class="portrait-remove hidden" id="portrait-remove">Remove portrait</button>
+        <div class="char-name" id="ui-char-name">—</div>
+        <div class="char-class" id="ui-char-class">The Traveler · Level 1</div>
+        <div class="char-title-badge" id="ui-char-title">"First Step"</div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">Vitals</div>
+        <div class="stat-row">
+          <div class="stat-header"><span class="stat-name">Health</span><span class="stat-value" id="ui-hp-val">100 / 100</span></div>
+          <div class="bar-track"><div class="bar-fill bar-hp" id="ui-hp-bar" style="width:100%"></div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-header"><span class="stat-name">Mana</span><span class="stat-value" id="ui-mp-val">50 / 50</span></div>
+          <div class="bar-track"><div class="bar-fill bar-mp" id="ui-mp-bar" style="width:100%"></div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-header"><span class="stat-name">Stamina</span><span class="stat-value" id="ui-sp-val">100 / 100</span></div>
+          <div class="bar-track"><div class="bar-fill bar-sp" id="ui-sp-bar" style="width:100%"></div></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-header"><span class="stat-name">Experience</span><span class="stat-value" id="ui-exp-val">0 / 100</span></div>
+          <div class="bar-track"><div class="bar-fill bar-exp" id="ui-exp-bar" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">Journey stats</div>
+        <div class="stat-grid">
+          <div class="stat-tile"><span class="tile-label">Steps</span><div class="tile-number" id="ui-steps">0</div></div>
+          <div class="stat-tile"><span class="tile-label">Days out</span><div class="tile-number" id="ui-days">1</div></div>
+          <div class="stat-tile"><span class="tile-label">Items found</span><div class="tile-number" id="ui-items">0</div></div>
+          <div class="stat-tile"><span class="tile-label">Events seen</span><div class="tile-number" id="ui-events">0</div></div>
+          <div class="stat-tile"><span class="tile-label">Gems earned</span><div class="tile-number" id="ui-gems-earned">0</div></div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">Current location</div>
+        <div class="location-display">
+          <div class="location-eyebrow">Now passing through</div>
+          <div class="location-name" id="ui-loc-name">The First Road</div>
+          <div class="location-desc" id="ui-loc-desc">The road stretches ahead, unfamiliar and full of quiet promise.</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-label">Journal</div>
+        <nav class="sidebar-nav">
+          <button class="nav-btn active" data-panel="log">
+            <span class="nav-btn-icon">📜</span>Travel log
+          </button>
+          <button class="nav-btn" data-panel="skills">
+            <span class="nav-btn-icon">⚔️</span>Skills
+            <span class="nav-btn-count" id="ui-skill-count">0</span>
+          </button>
+          <button class="nav-btn" data-panel="collection">
+            <span class="nav-btn-icon">🎒</span>Collection
+            <span class="nav-btn-count" id="ui-item-count">0</span>
+          </button>
+          <button class="nav-btn" data-panel="titles">
+            <span class="nav-btn-icon">🏅</span>Titles
+            <span class="nav-btn-count" id="ui-title-count">1</span>
+          </button>
+        </nav>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="path-bar">
+        <span class="path-label" id="ui-path-dest">To: The Old Mill</span>
+        <div class="path-track">
+          <div class="path-fill" id="ui-path-fill" style="width:0%">
+            <span class="path-walker">🚶</span>
+          </div>
+        </div>
+        <span class="path-destination" id="ui-path-remain">Starting out...</span>
+      </div>
+
+      <div class="panel-area" id="panel-area">
+
+        <!-- LOG -->
+        <div id="panel-log">
+          <div class="log-header">
+            <span class="log-title">Traveler's Log</span>
+            <span class="log-day" id="ui-log-day">Day 1 of the journey</span>
+          </div>
+          <div class="log-scroll" id="log-scroll">
+            <ul id="log-feed"></ul>
+          </div>
+          <div class="log-load-more-wrap hidden" id="log-load-more-wrap">
+            <button type="button" class="log-load-more" id="log-load-more">Load earlier entries</button>
+          </div>
+        </div>
+
+        <!-- SKILLS -->
+        <div id="panel-skills" class="hidden">
+          <div class="panel-title">Skills</div>
+          <div class="panel-subtitle">Earned through experience on the road. Each path taken shapes the traveler differently.</div>
+          <div id="skills-content"></div>
+        </div>
+
+        <!-- COLLECTION -->
+        <div id="panel-collection" class="hidden">
+          <div class="panel-title">Collection</div>
+          <div class="panel-subtitle" id="collection-subtitle">Everything gathered on the road, carried without weight.</div>
+          <div id="collection-content"></div>
+        </div>
+
+        <!-- TITLES -->
+        <div id="panel-titles" class="hidden">
+          <div class="panel-title">Titles</div>
+          <div class="panel-subtitle">Names given by the road. Select one to display beside your name.</div>
+          <div id="titles-content"></div>
+        </div>
+
+      </div>
+
+      <div class="status-bar">
+        <div class="status-indicator">
+          <div class="status-dot walking" id="ui-status-dot"></div>
+          <span class="status-txt" id="ui-status-label" style="color:#6B7F5E">Walking</span>
+        </div>
+        <span class="status-sep">&middot;</span>
+        <span class="status-txt" id="ui-step-rate">1 step / sec</span>
+        <span class="status-sep">&middot;</span>
+        <span class="status-txt" id="ui-rest-time">Next rest at 10:00 pm</span>
+        <span class="status-sep ml-auto">&middot;</span>
+        <span class="status-txt" id="ui-clock">Day 1</span>
+      </div>
+    </main>
+  </div>
+</div>
+
+
+</div>
+
+<script src="game-core.js"></script>
+<script src="long-road.js"></script>
+</body>
+</html>    flex-direction: column;
+    min-height: 100vh;
+}
+
+  .journal-cover {
+    background: var(--panel-bg); border: 2px solid var(--panel-border); border-radius: 4px;
+    width: 100%; max-width: 480px; padding: 48px 48px 40px; position: relative;
+    box-shadow: 4px 4px 0 var(--parchment-deep);
+  }
+  .journal-cover::before { content: ''; position: absolute; left: 28px; top: 0; bottom: 0; width: 2px; background: var(--parchment-deep); }
+
+  .cover-eyebrow { font-family: var(--font-data); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-ghost); margin-bottom: 8px; }
+  .cover-title { font-family: var(--font-display); font-size: 32px; font-weight: 600; color: var(--ink); line-height: 1.15; margin-bottom: 6px; }
+  .cover-title span { color: var(--leather); }
+  .cover-rule { width: 48px; height: 2px; background: var(--leather); margin: 20px 0; }
+  .cover-intro { font-size: 14px; color: var(--ink-faded); font-style: italic; line-height: 1.65; margin-bottom: 32px; }
+
+  .field-group { margin-bottom: 20px; }
+  .field-label { font-family: var(--font-data); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-ghost); display: block; margin-bottom: 8px; }
+  .field-input { width: 100%; background: var(--inset-bg); border: 1px solid var(--parchment-deep); border-radius: 4px; padding: 10px 14px; font-family: var(--font-display); font-size: 18px; color: var(--ink); outline: none; transition: border-color 0.15s; }
+  .field-input:focus { border-color: var(--leather); }
+  .field-input::placeholder { color: var(--ink-ghost); font-style: italic; }
+  .field-hint { font-size: 12px; color: var(--ink-ghost); font-style: italic; margin-top: 6px; }
+
+  .begin-btn { width: 100%; background: var(--ink); color: var(--parchment); border: none; border-radius: 4px; padding: 14px; font-family: var(--font-display); font-size: 16px; font-weight: 600; letter-spacing: 0.04em; cursor: pointer; margin-top: 8px; transition: background 0.15s; }
+  .begin-btn:hover { background: var(--leather); }
+  .begin-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .cover-footer { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--parchment-deep); font-family: var(--font-data); font-size: 10px; color: var(--ink-ghost); letter-spacing: 0.06em; text-align: center; }
+
+  .page-header { background: var(--ink); color: var(--parchment-mid); padding: 12px 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--leather); flex-shrink: 0; }
+  .wordmark { font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: 0.04em; color: var(--parchment); }
+  .wordmark span { color: var(--leather-light); }
+  .header-meta { font-family: var(--font-data); font-size: 11px; color: var(--ink-ghost); letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .layout { display: grid; grid-template-columns: 280px 1fr; flex: 1; min-height: 0; }
+
+  /* ── Sidebar ───────────────────────────────────────── */
+  .sidebar { background: var(--panel-bg); border-right: 2px solid var(--panel-border); display: flex; flex-direction: column; overflow-y: auto; }
+  .sidebar-section { border-bottom: 1px solid var(--parchment-deep); padding: 18px 20px; flex-shrink: 0; }
+  .sidebar-section:last-child { border-bottom: none; }
+  .section-label { font-family: var(--font-data); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-ghost); margin-bottom: 12px; }
+
+  .character-block { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px 20px 20px; border-bottom: 1px solid var(--parchment-deep); background: var(--inset-bg); flex-shrink: 0; }
+  .portrait-ring { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--leather); background: var(--parchment-deep); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; cursor: pointer; flex-shrink: 0; }
+  .portrait-ring:hover .portrait-hover { opacity: 1; }
+  .portrait-hover { position: absolute; inset: 0; border-radius: 50%; background: rgba(58,50,38,0.65); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; font-family: var(--font-data); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--parchment); text-align: center; padding: 6px; pointer-events: none; }
+  .portrait-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+  .portrait-figure { font-size: 36px; line-height: 1; user-select: none; }
+  .portrait-remove { font-family: var(--font-data); font-size: 9px; letter-spacing: 0.06em; color: var(--ink-ghost); background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; margin-top: -4px; transition: color 0.15s; }
+  .portrait-remove:hover { color: var(--wax); }
+  .char-name { font-family: var(--font-display); font-size: 20px; font-weight: 600; color: var(--ink); letter-spacing: 0.02em; text-align: center; }
+  .char-class { font-family: var(--font-data); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-ghost); }
+  .char-title-badge { background: var(--wax-light); border: 1px solid var(--wax); color: var(--wax); font-family: var(--font-body); font-style: italic; font-size: 12px; padding: 3px 10px; border-radius: 20px; text-align: center; }
+
+  .stat-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+  .stat-row:last-child { margin-bottom: 0; }
+  .stat-header { display: flex; justify-content: space-between; align-items: baseline; }
+  .stat-name { font-family: var(--font-data); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faded); }
+  .stat-value { font-family: var(--font-data); font-size: 12px; color: var(--ink); }
+  .bar-track { height: 6px; background: var(--parchment-deep); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+  .bar-hp  { background: var(--wax); }
+  .bar-mp  { background: var(--blue); }
+  .bar-sp  { background: var(--moss); }
+  .bar-exp { background: var(--leather-light); }
+
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-tile { background: var(--inset-bg); border: 1px solid var(--parchment-deep); border-radius: 6px; padding: 8px 10px; }
+  .tile-label { font-family: var(--font-data); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-ghost); display: block; margin-bottom: 2px; }
+  .tile-number { font-family: var(--font-data); font-size: 15px; font-weight: 500; color: var(--ink); }
+
+  .location-display { background: var(--inset-bg); border: 1px solid var(--parchment-deep); border-radius: 6px; padding: 12px 14px; }
+  .location-eyebrow { font-family: var(--font-data); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--moss); margin-bottom: 4px; }
+  .location-name { font-family: var(--font-display); font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .location-desc { font-size: 12px; color: var(--ink-faded); font-style: italic; line-height: 1.4; }
+
+  .sidebar-nav { display: flex; flex-direction: column; gap: 6px; }
+  .nav-btn { background: var(--parchment); border: 1px solid var(--parchment-deep); border-radius: 6px; padding: 10px 14px; text-align: left; cursor: pointer; font-family: var(--font-body); font-size: 13px; color: var(--ink-faded); display: flex; align-items: center; gap: 10px; transition: background 0.15s, border-color 0.15s, color 0.15s; }
+  .nav-btn:hover { background: var(--parchment-mid); border-color: var(--leather); color: var(--ink); }
+  .nav-btn.active { background: var(--ink); border-color: var(--ink); color: var(--parchment); }
+  .nav-btn-icon { font-size: 15px; }
+  .nav-btn-count { margin-left: auto; font-family: var(--font-data); font-size: 11px; background: var(--parchment-deep); padding: 1px 7px; border-radius: 10px; color: var(--ink-faded); }
+  .nav-btn.active .nav-btn-count { background: rgba(255,255,255,0.12); color: var(--parchment-mid); }
+
+  /* ── Main panel ────────────────────────────────────── */
+  .main { display: flex; flex-direction: column; background: var(--page-bg); min-height: 0; }
+
+  .path-bar { background: var(--panel-bg); border-bottom: 1px solid var(--parchment-deep); padding: 12px 28px; display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+  .path-label { font-family: var(--font-data); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-ghost); white-space: nowrap; }
+  .path-track { flex: 1; height: 4px; background: var(--parchment-deep); border-radius: 2px; position: relative; overflow: visible; }
+  .path-fill { height: 100%; background: var(--leather); border-radius: 2px; position: relative; transition: width 0.8s ease; min-width: 16px; }
+  .path-walker { position: absolute; right: -9px; top: 50%; transform: translateY(-50%); font-size: 13px; }
+  .path-destination { font-family: var(--font-data); font-size: 10px; color: var(--ink-ghost); white-space: nowrap; }
+
+  /* Panel content area */
+  .panel-area { flex: 1; overflow-y: auto; padding: 28px 32px; }
+
+  /* ── Log panel ─────────────────────────────────────── */
+  .log-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; border-bottom: 2px solid var(--parchment-deep); padding-bottom: 12px; }
+  .log-title { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--ink); letter-spacing: 0.02em; }
+  .log-day { font-family: var(--font-data); font-size: 11px; color: var(--ink-ghost); letter-spacing: 0.06em; }
+  #log-feed { list-style: none; }
+
+  .log-entry { display: flex; gap: 16px; margin-bottom: 20px; position: relative; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+  .log-entry::before { content: ''; position: absolute; left: 29px; top: 32px; bottom: -20px; width: 1px; background: var(--parchment-deep); }
+  .log-entry:last-child::before { display: none; }
+
+  .entry-time-col { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; padding-top: 2px; }
+  .entry-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--leather); background: var(--parchment); flex-shrink: 0; margin-top: 4px; }
+  .entry-dot.dot-event { border-color: var(--moss); }
+  .entry-dot.dot-rare  { border-color: var(--wax); background: var(--wax-light); }
+  .entry-dot.dot-level { border-color: var(--leather); background: var(--leather); }
+  .entry-dot.dot-rest  { border-color: var(--ink-ghost); background: var(--parchment-mid); }
+  .entry-dot.dot-skill { border-color: var(--blue); background: var(--blue-light); }
+
+  .entry-time { font-family: var(--font-data); font-size: 10px; color: var(--ink-ghost); writing-mode: vertical-lr; transform: rotate(180deg); letter-spacing: 0.04em; }
+  .entry-body { flex: 1; background: var(--panel-bg); border: 1px solid var(--parchment-deep); border-radius: 6px; padding: 12px 16px; border-left: 3px solid var(--parchment-deep); }
+  .entry-body.ev-event { border-left-color: var(--moss); }
+  .entry-body.ev-rare  { border-left-color: var(--wax); background: var(--wax-light); }
+  .entry-body.ev-level { border-left-color: var(--leather); }
+  .entry-body.ev-rest  { border-left-color: var(--ink-ghost); opacity: 0.75; }
+  .entry-body.ev-skill { border-left-color: var(--blue); background: var(--blue-light); }
+
+  .entry-tag { font-family: var(--font-data); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-ghost); margin-bottom: 4px; }
+  .entry-tag.tag-event { color: var(--moss); }
+  .entry-tag.tag-rare  { color: var(--wax); }
+  .entry-tag.tag-level { color: var(--leather); }
+  .entry-tag.tag-skill { color: var(--blue); }
+
+  .entry-text { font-size: 14px; color: var(--ink); line-height: 1.55; font-style: italic; }
+  .entry-text strong { font-style: normal; font-weight: 600; }
+  .entry-reward { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .reward-chip { font-family: var(--font-data); font-size: 10px; background: var(--parchment-deep); border: 1px solid var(--parchment-mid); color: var(--ink-faded); padding: 2px 8px; border-radius: 12px; }
+  .reward-chip.chip-item  { background: var(--moss-light); border-color: var(--moss); color: var(--moss); }
+  .reward-chip.chip-exp   { background: #F2EDE3; border-color: var(--leather); color: var(--leather); }
+  .reward-chip.chip-stat  { background: var(--wax-light); border-color: var(--wax); color: var(--wax); }
+  .reward-chip.chip-skill { background: var(--blue-light); border-color: var(--blue); color: var(--blue); }
+  .reward-chip.chip-cost  { background: #F9EDE8; border-color: #C0604A; color: #C0604A; }
+
   /* ── Skills panel ──────────────────────────────────── */
   .panel-title { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
   .panel-subtitle { font-size: 13px; color: var(--ink-faded); font-style: italic; margin-bottom: 24px; border-bottom: 2px solid var(--parchment-deep); padding-bottom: 12px; }
